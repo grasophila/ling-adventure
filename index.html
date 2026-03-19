@@ -399,7 +399,7 @@ const story = [
     ]
   },
   { text: "你只是轻轻一提气，便瞬间出现在两队人马之间，你努力回想着\"母亲\"身边流转的元素能量，靠着山林里充裕的木元素将刺客们用藤蔓抽飞。" },
-  { text: "刺客们见情况不对，立马开始逃窜，身后马车旁 the人想追，看见你神色淡淡地立在原地便也不敢再轻举妄动。" },
+  { text: "刺客们见情况不对，立马开始逃窜，身后马车旁的人想追，看见你神色淡淡地立在原地便也不敢再轻举妄动。" },
   { text: "一切尘埃落定后，你听见身后的马车里走出来一位穿着华贵的年轻男子，他朝你鞠躬拱手。", next: 16 },
   { text: "你伸手抚上旁边树木上垂下的叶片，刺客们被突然冒出的土墙挡住，惊诧之下对视一眼，迅速往后退去。" },
   { text: "马车旁的人一阵骚动后又安静下来，有一位看起来从容镇定的男子从马车里走出，对着前方道路拱手，高声喊到：\"感谢高人相助，可否一见？\"" },
@@ -478,7 +478,7 @@ function render(){
   tipEl.innerText = "";
 
   if(cur.day !== undefined) dayEl.innerText = cur.day;
-  if(cur.weather !== undefined) weatherEl.innerText = cur.day;
+  if(cur.weather !== undefined) weatherEl.innerText = cur.weather;
 
   if(cur.text){
     tipEl.innerText = "正在阅读...";
@@ -522,5 +522,6 @@ window.onload = function(){
 </script>
 </body>
 </html>
+
 
 
