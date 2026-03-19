@@ -27,7 +27,31 @@ body {
   justify-content: center;
 }
 
-/* 🌿 飘落光点 */
+/* 绿色落叶光点 - 更慢、摇摆更大 */
+.falling-leaf {
+  position: fixed;
+  top: -20px;
+  width: 3px;
+  height: 3px;
+  background: #8fbc8f;
+  border-radius: 50%;
+  opacity: 0.7;
+  pointer-events: none;
+  z-index: 0;
+  animation: leafFall linear infinite;
+}
+
+@keyframes leafFall {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(105vh) translateX(150px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
 .leaves-container {
   position: fixed;
   top: 0;
@@ -54,7 +78,6 @@ body {
   100% { transform: translateY(110vh) rotate(360deg) translateX(50px); opacity: 0; }
 }
 
-/* 封面 */
 .cover {
   width: 100%;
   max-width: 700px;
@@ -90,7 +113,6 @@ body {
   background: #c44e2f;
 }
 
-/* 游戏容器 */
 .container {
   width: 100%;
   max-width: 700px;
@@ -131,7 +153,6 @@ body {
   color: #e6d5b8;
 }
 
-/* 故事框 */
 .story-box {
   background: rgba(20,15,10,0.7);
   border: 1px solid #9a3820;
@@ -146,7 +167,6 @@ body {
   position: relative;
 }
 
-/* 🍃 原版藤蔓 */
 .story-box::before {
   content: "╭─── ⋆⋅🍃⋅⋆ ───";
   position: absolute;
@@ -168,7 +188,6 @@ body {
   pointer-events: none;
 }
 
-/* 🔯 秦朝角落符文 */
 .rune-tl {
   position: absolute;
   top: -14px;
@@ -210,7 +229,6 @@ body {
   z-index: 3;
 }
 
-/* ✅ 提示语：对话框正下方 + 小字 */
 .tip {
   text-align: center;
   font-size: 14px;
@@ -244,6 +262,26 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* 飘入文字样式 */
+.day-end-text {
+  position: fixed;
+  left: 50%;
+  bottom: 22vh;
+  transform: translateX(-50%);
+  font-size: 18px;
+  color: #d4af37;
+  text-shadow: 0 0 10px #9a3820;
+  pointer-events: none;
+  z-index: 99;
+  animation: dayEndFloat 2.5s ease forwards;
+}
+@keyframes dayEndFloat {
+  0% { opacity: 0; transform: translate(-50%, 40px); }
+  30% { opacity: 1; transform: translate(-50%, 0); }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 @media (max-width: 480px) {
   body { padding: 10px; }
   .story-box { min-height: 200px; padding: 22px 16px; }
@@ -254,27 +292,27 @@ body {
 
 <body>
 
+<div id="leafContainer"></div>
+
 <div class="leaves-container" id="leavesContainer"></div>
 
-<!-- 封面 -->
 <div class="cover" id="cover">
   <div class="cover-title">灵</div>
   <div class="cover-author">制作者：风灵烟</div>
   <button class="start-btn" id="startBtn">开始游戏</button>
 </div>
 
-<!-- 游戏界面 -->
 <div class="container" id="game">
   <div class="title">灵</div>
 
   <div class="status-bar">
     <div class="status">
-      <div class="label">DAY</div>
+      <div class="label">日</div>
       <div id="day" class="value">1</div>
     </div>
     <div class="status">
-      <div class="label">灵韵</div>
-      <div id="power" class="value">100</div>
+      <div class="label">天气</div>
+      <div id="weather" class="value">晴</div>
     </div>
   </div>
 
@@ -284,9 +322,7 @@ body {
     <div id="text" class="story-text">点击开始</div>
   </div>
 
-  <!-- 提示语回到正下方 -->
   <div class="tip" id="tip"></div>
-
   <div class="choices" id="choices"></div>
 </div>
 
@@ -297,12 +333,27 @@ const startBtn = document.getElementById('startBtn');
 const textEl = document.getElementById('text');
 const choicesEl = document.getElementById('choices');
 const tipEl = document.getElementById('tip');
+const dayEl = document.getElementById('day');
+const weatherEl = document.getElementById('weather');
 const leavesContainer = document.getElementById('leavesContainer');
+const leafContainer = document.getElementById('leafContainer');
 
 let step = 0;
 let isTyping = false;
 
-// 飘落光点
+// 创建绿色落叶光点 - 速度更慢，摇摆更大
+function createGreenLeaves() {
+  const count = 60;
+  for (let i = 0; i < count; i++) {
+    const leaf = document.createElement('div');
+    leaf.className = 'falling-leaf';
+    leaf.style.left = Math.random() * 100 + 'vw';
+    leaf.style.animationDuration = (Math.random() * 12 + 10) + 's';
+    leaf.style.animationDelay = Math.random() * 7 + 's';
+    leafContainer.appendChild(leaf);
+  }
+}
+
 function createLeaves() {
   const leafCount = 25;
   for (let i = 0; i < leafCount; i++) {
@@ -317,17 +368,26 @@ function createLeaves() {
   }
 }
 
+// 飘入日结束文字
+function showDayEnd(day) {
+  const div = document.createElement('div');
+  div.className = 'day-end-text';
+  div.innerText = `日${day}剧情结束`;
+  document.body.appendChild(div);
+  setTimeout(() => div.remove(), 2500);
+}
+
 const story = [
   { text: "风停了，你看着躺在一片落叶丛里的\"母亲\"，轻声对她说晚安。于是世界又安静下来，你百无聊赖地躺在她身侧，像哺乳期的幼崽寻求着一个温暖的怀抱。" },
   { text: "抬起头数到第十六颗星星时，你听到山脚下传来躁动声，飞鸟掠过你头顶，你远远望去，看到与你长相相似的一群小动物经过。" },
-  { 
+  {
     choice: [
       { text: "A.去看看小动物们", next: 3 },
       { text: "B.还是留在母亲身边吧", next: 4 }
     ]
   },
-  { text: "你再次回头看了一眼还在沉睡的\"母亲\"，轻手轻脚的飞掠下山，跟在那群小动物身后。" },
-  { text: "你盯着那张恬静的女子侧脸发呆，山脚下传来与此处格格不入的嘈杂声，你最后还是没按耐住好奇心，偷偷溜了下去。" },
+  { text: "你再次回头看了一眼还在沉睡的\"母亲\"，轻手轻脚的飞掠下山，跟在那群小动物身后。", next: 5 },
+  { text: "你盯着那张恬静的女子侧脸发呆，山脚下传来与此处格格不入的嘈杂声，你最后还是没按耐住好奇心，偷偷溜了下去。", next: 5 },
   { text: "小动物们有些骑着马，有些装在结构复杂花纹精致的木头里，你一路上好奇地打量，边听边看，只用了半个夜晚便大致理解了他们的语言。" },
   { text: "原来是母亲之前提到的人类啊。你想。和我们真的长得很像呢。" },
   { text: "马上就要到宽阔的大路上了。也许我等他们离开树林后就得回到母亲身边了。你想。" },
@@ -335,17 +395,57 @@ const story = [
   {
     choice: [
       { text: "A.跑出去试图阻止", next: 10 },
-      { text: "B.暗中帮帮他们", next: 11 }
+      { text: "B.暗中帮帮他们", next: 13 }
     ]
   },
-  { text: "你只是轻轻一提气，便瞬间出现在两队人马之间，你努力回想着\"母亲\"身边流转的元素能量，靠着山林里充裕的木元素将刺客们用藤蔓抽飞。刺客们见情况不对，立马开始逃窜，身后马车旁的人想追，看见你神色淡淡地立在原地便也不敢再轻举妄动。一切尘埃落定后，你听见身后的马车里走出来一位穿着华贵的年轻男子，他朝你鞠躬拱手。" },
-  { text: "你伸手抚上旁边树木垂下的叶片，刺客们被突然冒出的土墙挡住，惊诧之下对视一眼，迅速往后退去。马车旁的人一阵骚动后又安静下来，有一位看起来从容镇定的男子从马车里走出，对着前方道路拱手，高声喊到：\"感谢高人相助，可否一见？\"你纠结的用手抠树皮，最后好奇心战胜了谨慎，你走了出去。" },
+  { text: "你只是轻轻一提气，便瞬间出现在两队人马之间，你努力回想着\"母亲\"身边流转的元素能量，靠着山林里充裕的木元素将刺客们用藤蔓抽飞。" },
+  { text: "刺客们见情况不对，立马开始逃窜，身后马车旁 the人想追，看见你神色淡淡地立在原地便也不敢再轻举妄动。" },
+  { text: "一切尘埃落定后，你听见身后的马车里走出来一位穿着华贵的年轻男子，他朝你鞠躬拱手。", next: 16 },
+  { text: "你伸手抚上旁边树木上垂下的叶片，刺客们被突然冒出的土墙挡住，惊诧之下对视一眼，迅速往后退去。" },
+  { text: "马车旁的人一阵骚动后又安静下来，有一位看起来从容镇定的男子从马车里走出，对着前方道路拱手，高声喊到：\"感谢高人相助，可否一见？\"" },
+  { text: "你纠结的用手抠树皮，最后好奇心战胜了谨慎，你走了出去。", next: 16 },
   { text: "男子冲你露出一个得体的笑容：\"我们几人是秦国的商贩，得仙人所救实乃大幸！不知仙人如何称呼？\"" },
   { text: "你歪了歪脑袋，不知道他在说什么。对方自觉自己失礼，连忙赔罪，吩咐仆从递上一个古朴精致的饰品盒，打开瞬间你便被里面晶莹剔透的宝石与璀璨的金银晃了眼睛。" },
   { text: "男子双手奉上这份谢礼，看你迟迟不收，忐忑又小心翼翼的抬头。" },
   { text: "\"你们要去哪？\"你说。" },
   { text: "\"回到秦国，仙人。\"他恭敬回答，弯腰的姿势未变半分。" },
-  { text: "\"我可以跟你们一起吗？\"蓝发的仙人俯视着面前渺小的，卑微的人类。" }
+  { text: "\"我可以跟你们一起吗？\"蓝发的仙人俯视着面前渺小的，卑微的人类。", end: 1 },
+  { day: 2, weather: "晴", text: "你跟着这群商人去了最近的秦国城池，领头之人认为你是下凡来巡视人间的仙人，一路上从未敢怠慢于你。" },
+  { text: "靠着商人的符传，你们很顺利的进入了城池内，商人们认为你这身行头实在太过显眼，与你临了分别时为你留下一套马车里本要用来送往京城出售的锦衣才恭敬退去。" },
+  { text: "你站在他们提前为你办好入住的客舍里，捧着那用上好锦帛制成，边缘勾勒出大片金纹的玄衣歪了歪头，有点茫然。" },
+  { text: "你当然不知道他们内心所想，也不知道他们匆匆离去是怕打扰了你这神秘的仙人游历凡尘。你只知道你孤身一人来到了完全不熟悉的人间，还不知道回去的路。" },
+  { text: "想到那片与世隔绝的树林与现在应该还在熟睡的“母亲”，已经隐隐开始后悔了。" },
+  { text: "但事已至此，你也很快丢掉了心里那点不安，换上新衣服后乐颠颠地开始逛起这个坐落于秦国边境的城池了。" },
+  { text: "出了客舍你便能看到不远处城墙上隔一段便默然矗立的黑甲士兵，街上也偶有成队的军卒穿着轻甲路过，你自然意识不到这一切代表的含义，只是高兴地认为这里是热闹的聚居地。" },
+  { text: "现在正值正午，烈日散发着难以令人忽视的热度，小市两边的小酒馆支着遮阳篷，零星有几个人三三两两坐在其间饮酒谈天。" },
+  { text: "你对那种散发着刺激性味道的小麦水不感兴趣，捕捉痕迹地唤起一律清风穿过全身，为你扫去燥热后，扭头便被街边几个捉蚂蚱斗蛐蛐的小孩吸引。" },
+  { text: "你蹲下身，也不管身上的华服是不是垂到了遍布尘土和石子的地面上，乐颠颠地凑起了小孩的热闹。" },
+  { text: "看着几个缺了牙齿脸上红扑扑的小孩全神贯注地为自己心爱的“战士”加油助威，你也忍不住屏气凝神起来，心中暗暗为你看中的那只油光锃亮的“黑武士”加油。" },
+  { text: "游戏进行过半，场上两只蛐蛐的主人都卯足了劲憋红脸为自己家的武士呐喊，你看中的“黑武士”一时不敌，就快要被掀翻。" },
+  {
+    choice: [
+      { text: "A.让附近的风元素掀起一场小风，把它的对手彻底掀翻。", next: 35 },
+      { text: "B.维护游戏的正义性，不去干涉。", next: 36 }
+    ]
+  },
+  { text: "你悄无声息地勾勾手指，一阵小风绕了一圈你的指尖，飘飘悠悠地掀起那只浅棕色的蛐蛐。看着浅棕色蛐蛐的主人露出失望的神情，你反而得意地要把尾巴翘上天了。", next: 37 },
+  { text: "毫无意外地，“黑武士”被掀翻了，你跟着它的主人一起发出一声失望的叹息，瘪着嘴很不高兴的样子。", next: 37 },
+  { text: "你还沉浸在孩童游戏的乐趣里，浑然不知天色将晚，夜幕将至，几个小孩蹦起来，叽叽喳喳地跑向家的方向。" },
+  { text: "你没反应过来，击鼓传呼声已经由远及近来到这条街的入口。" },
+  { text: "你没明白人类在晨昏交接时分敲响这种奇怪的乐器是何含义，只是继续专注地地上的蚂蚁洞里试图寻找到蛐蛐的半分踪影。" },
+  { text: "“你是何人！宵禁后禁止夜行！”巡夜兵看到你明目张胆地违反宵禁，面色不善地凑过来就要揪着你领子把你提起来。" },
+  { text: "他刚凑近，看到你身上明显华贵的衣服便一顿，思索片刻后皱起眉：“公子在此处作甚？可有符节？”" },
+  { text: "你自然听不懂他在说什么，蹲在地上无辜地看着他。" },
+  { text: "士卒一下拿不定主意，看到你转过头来后露出的那双血红色的眼睛后一惊，最终还是硬着头皮把你拎起来，带到城主府后再做定夺。" },
+  { text: "城主刚从府衙归家便听见通报，穿着官府急匆匆赶来，看到你的样貌也是惊疑：“敢问阁下何人？何来此城？”" },
+  { text: "你耷拉下脑袋，被他们文邹邹的话搅地头痛，只是皱着眉头摇摇脑袋。" },
+  { text: "城主更加惶恐，你在这呆的无聊，略过身边的侍卫就想走。" },
+  { text: "侍卫一惊，连忙堵在堂屋门口，旁边的士卒更是举起长矛就要拦你。" },
+  { text: "你铁了心想走，觉得这群小动物真是太粘人了。旁边的人手忙脚乱，心一横，长矛和剑光一起朝你涌来。" },
+  { text: "你想，这可不行，受伤的话会很麻烦，母亲会怪罪你，自己的血液也不是小动物们能碰到的东西……" },
+  { text: "于是你一挥袖子，金器全部从士卒们手中飞出，直直插入屋内的横梁上。但你操控元素的能力一向不精，尽管如何小心，还是有人被飞掠的兵器划伤。" },
+  { text: "粘稠刺鼻的血腥味在屋内蔓延，你蹲住脚步，回头望向那位脸上被划出一条血痕，瞪大双眼吓破胆的士卒，深深叹息。" },
+  { text: "还是闯祸了……", end: 2 }
 ];
 
 startBtn.onclick = function(){
@@ -377,10 +477,16 @@ function render(){
   choicesEl.innerHTML = "";
   tipEl.innerText = "";
 
+  if(cur.day !== undefined) dayEl.innerText = cur.day;
+  if(cur.weather !== undefined) weatherEl.innerText = cur.day;
+
   if(cur.text){
     tipEl.innerText = "正在阅读...";
     typeText(cur.text, function(){
       tipEl.innerText = "点击继续";
+      if (cur.end) {
+        setTimeout(() => showDayEnd(cur.end), 500);
+      }
     });
   }else if(cur.choice){
     cur.choice.forEach(c => {
@@ -398,15 +504,17 @@ function render(){
 
 document.addEventListener("click", () => {
   if(isTyping) return;
-  if(step < story.length-1){
-    step++;
-    render();
-  }else{
-    tipEl.innerText = "结局";
+  const cur = story[step];
+  if(cur.next !== undefined){
+    step = cur.next;
+  } else {
+    if(step < story.length-1) step++;
   }
+  render();
 });
 
 window.onload = function(){
+  createGreenLeaves();
   createLeaves();
   game.style.display = "none";
   cover.style.display = "block";
@@ -414,4 +522,5 @@ window.onload = function(){
 </script>
 </body>
 </html>
+
 
