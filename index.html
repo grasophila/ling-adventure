@@ -10,18 +10,95 @@
   padding: 0;
   box-sizing: border-box;
 }
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
 body {
   background: #101013;
   color: #e6d5b8;
-  font-family: "PingFang SC", "Microsoft YaHei", serif;
+  font-family: "PingFang SC","Microsoft YaHei",serif;
   background-image: url("https://www.transparenttextures.com/patterns/old-paper.png");
   background-blend-mode: overlay;
-  padding: 20px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.container {
+
+/* 🌿 飘落光点 */
+.leaves-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+.leaf {
+  position: absolute;
+  top: -10%;
+  width: 4px;
+  height: 4px;
+  background: #6B8E55;
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: fall linear infinite;
+}
+@keyframes fall {
+  0% { transform: translateY(0) rotate(0deg) translateX(0); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.5; }
+  100% { transform: translateY(110vh) rotate(360deg) translateX(50px); opacity: 0; }
+}
+
+/* 封面 */
+.cover {
+  width: 100%;
   max-width: 700px;
-  margin: 0 auto;
+  text-align: center;
+  padding: 60px 20px;
+  position: relative;
+  z-index: 1;
 }
+.cover-title {
+  font-size: 52px;
+  color: #d4af37;
+  letter-spacing: 12px;
+  margin-bottom: 20px;
+  text-shadow: 0 0 12px #9a3820;
+}
+.cover-author {
+  font-size: 16px;
+  color: #c0b298;
+  margin-bottom: 60px;
+  opacity: 0.8;
+}
+.start-btn {
+  background: #9a3820;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 14px 36px;
+  font-size: 17px;
+  cursor: pointer;
+  transition: 0.25s;
+}
+.start-btn:hover {
+  background: #c44e2f;
+}
+
+/* 游戏容器 */
+.container {
+  width: 100%;
+  max-width: 700px;
+  position: relative;
+  display: none;
+  z-index: 1;
+}
+
 .title {
   text-align: center;
   font-size: 28px;
@@ -30,6 +107,7 @@ body {
   margin: 10px 0 20px;
   text-shadow: 0 0 8px #9a3820;
 }
+
 .status-bar {
   display: flex;
   gap: 12px;
@@ -52,32 +130,100 @@ body {
   font-weight: bold;
   color: #e6d5b8;
 }
+
+/* 故事框 */
 .story-box {
   background: rgba(20,15,10,0.7);
   border: 1px solid #9a3820;
   border-radius: 8px;
-  padding: 20px;
-  min-height: 220px;
+  padding: 28px 22px;
+  min-height: 240px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 8px;
   animation: fadeIn 0.6s;
+  position: relative;
 }
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+
+/* 🍃 原版藤蔓 */
+.story-box::before {
+  content: "╭─── ⋆⋅🍃⋅⋆ ───";
+  position: absolute;
+  top: -9px;
+  left: -2px;
+  color: #3a7d44;
+  font-size: 13px;
+  opacity: 0.85;
+  pointer-events: none;
 }
+.story-box::after {
+  content: "─── ⋆⋅🍃⋅⋆ ───╯";
+  position: absolute;
+  bottom: -9px;
+  right: -2px;
+  color: #3a7d44;
+  font-size: 13px;
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+/* 🔯 秦朝角落符文 */
+.rune-tl {
+  position: absolute;
+  top: -14px;
+  left: -14px;
+  font-size: 20px;
+  color: #d4af37;
+  opacity: 0.8;
+  animation: rune 12s linear infinite, glow 3s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 2;
+}
+.rune-br {
+  position: absolute;
+  bottom: -14px;
+  right: -14px;
+  font-size: 20px;
+  color: #d4af37;
+  opacity: 0.8;
+  animation: rune 12s linear infinite reverse, glow 3s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 2;
+}
+
+@keyframes rune {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes glow {
+  0% { filter: brightness(1); text-shadow: 0 0 2px #d4af37; }
+  100% { filter: brightness(1.3); text-shadow: 0 0 10px #d4af37, 0 0 15px #9a3820; }
+}
+
 .story-text {
   font-size: 16px;
   line-height: 1.7;
   text-align: center;
   white-space: pre-line;
+  position: relative;
+  z-index: 3;
 }
+
+/* ✅ 提示语：对话框正下方 + 小字 */
+.tip {
+  text-align: center;
+  font-size: 14px;
+  color: #c0b298;
+  opacity: 0.8;
+  margin-top: 4px;
+}
+
 .choices {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-top: 16px;
 }
 .choice-btn {
   background: #9a3820;
@@ -92,18 +238,33 @@ body {
 .choice-btn:hover {
   background: #c44e2f;
 }
-.tip {
-  text-align: center;
-  margin-top: 16px;
-  font-size: 14px;
-  color: #c0b298;
-  opacity: 0.8;
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 480px) {
+  body { padding: 10px; }
+  .story-box { min-height: 200px; padding: 22px 16px; }
+  .choice-btn { padding: 12px; }
 }
 </style>
 </head>
+
 <body>
 
-<div class="container">
+<div class="leaves-container" id="leavesContainer"></div>
+
+<!-- 封面 -->
+<div class="cover" id="cover">
+  <div class="cover-title">灵</div>
+  <div class="cover-author">制作者：风灵烟</div>
+  <button class="start-btn" id="startBtn">开始游戏</button>
+</div>
+
+<!-- 游戏界面 -->
+<div class="container" id="game">
   <div class="title">灵</div>
 
   <div class="status-bar">
@@ -118,24 +279,43 @@ body {
   </div>
 
   <div class="story-box">
+    <span class="rune-tl">⊰⦿⊱</span>
+    <span class="rune-br">⊰⦿⊱</span>
     <div id="text" class="story-text">点击开始</div>
   </div>
 
-  <div class="choices" id="choices"></div>
+  <!-- 提示语回到正下方 -->
   <div class="tip" id="tip"></div>
+
+  <div class="choices" id="choices"></div>
 </div>
 
 <script>
-const dayEl = document.getElementById('day');
-const powerEl = document.getElementById('power');
+const cover = document.getElementById('cover');
+const game = document.getElementById('game');
+const startBtn = document.getElementById('startBtn');
 const textEl = document.getElementById('text');
 const choicesEl = document.getElementById('choices');
 const tipEl = document.getElementById('tip');
+const leavesContainer = document.getElementById('leavesContainer');
 
-let day = 1;
-let power = 100;
 let step = 0;
-let mode = 'text';
+let isTyping = false;
+
+// 飘落光点
+function createLeaves() {
+  const leafCount = 25;
+  for (let i = 0; i < leafCount; i++) {
+    const leaf = document.createElement('div');
+    leaf.className = 'leaf';
+    leaf.style.left = Math.random() * 100 + '%';
+    leaf.style.width = (Math.random() * 4 + 2) + 'px';
+    leaf.style.height = leaf.style.width;
+    leaf.style.animationDuration = (Math.random() * 15 + 10) + 's';
+    leaf.style.animationDelay = Math.random() * 10 + 's';
+    leavesContainer.appendChild(leaf);
+  }
+}
 
 const story = [
   { text: "风停了，你看着躺在一片落叶丛里的\"母亲\"，轻声对她说晚安。于是世界又安静下来，你百无聊赖地躺在她身侧，像哺乳期的幼崽寻求着一个温暖的怀抱。" },
@@ -159,7 +339,7 @@ const story = [
     ]
   },
   { text: "你只是轻轻一提气，便瞬间出现在两队人马之间，你努力回想着\"母亲\"身边流转的元素能量，靠着山林里充裕的木元素将刺客们用藤蔓抽飞。刺客们见情况不对，立马开始逃窜，身后马车旁的人想追，看见你神色淡淡地立在原地便也不敢再轻举妄动。一切尘埃落定后，你听见身后的马车里走出来一位穿着华贵的年轻男子，他朝你鞠躬拱手。" },
-  { text: "你伸手抚上旁边树木上垂下的叶片，刺客们被突然冒出的土墙挡住，惊诧之下对视一眼，迅速往后退去。马车旁的人一阵骚动后又安静下来，有一位看起来从容镇定的男子从马车里走出，对着前方道路拱手，高声喊到：\"感谢高人相助，可否一见？\"你纠结的用手抠树皮，最后好奇心战胜了谨慎，你走了出去。" },
+  { text: "你伸手抚上旁边树木垂下的叶片，刺客们被突然冒出的土墙挡住，惊诧之下对视一眼，迅速往后退去。马车旁的人一阵骚动后又安静下来，有一位看起来从容镇定的男子从马车里走出，对着前方道路拱手，高声喊到：\"感谢高人相助，可否一见？\"你纠结的用手抠树皮，最后好奇心战胜了谨慎，你走了出去。" },
   { text: "男子冲你露出一个得体的笑容：\"我们几人是秦国的商贩，得仙人所救实乃大幸！不知仙人如何称呼？\"" },
   { text: "你歪了歪脑袋，不知道他在说什么。对方自觉自己失礼，连忙赔罪，吩咐仆从递上一个古朴精致的饰品盒，打开瞬间你便被里面晶莹剔透的宝石与璀璨的金银晃了眼睛。" },
   { text: "男子双手奉上这份谢礼，看你迟迟不收，忐忑又小心翼翼的抬头。" },
@@ -168,24 +348,44 @@ const story = [
   { text: "\"我可以跟你们一起吗？\"蓝发的仙人俯视着面前渺小的，卑微的人类。" }
 ];
 
-function updateUI() {
-  dayEl.textContent = day;
-  powerEl.textContent = power;
+startBtn.onclick = function(){
+  cover.style.display = "none";
+  game.style.display = "block";
+  render();
 }
 
-function render() {
-  const cur = story[step];
-  choicesEl.innerHTML = '';
-  tipEl.innerText = '';
+function typeText(text, callback){
+  isTyping = true;
+  textEl.innerText = "";
+  let i = 0;
+  const speed = 35;
+  function run(){
+    if(i < text.length){
+      textEl.innerText += text[i];
+      i++;
+      setTimeout(run, speed);
+    }else{
+      isTyping = false;
+      callback();
+    }
+  }
+  run();
+}
 
-  if (cur && cur.text) {
-    textEl.innerText = cur.text;
-    tipEl.innerText = '点击继续';
-    mode = 'text';
-  } else if (cur && cur.choice) {
+function render(){
+  const cur = story[step];
+  choicesEl.innerHTML = "";
+  tipEl.innerText = "";
+
+  if(cur.text){
+    tipEl.innerText = "正在阅读...";
+    typeText(cur.text, function(){
+      tipEl.innerText = "点击继续";
+    });
+  }else if(cur.choice){
     cur.choice.forEach(c => {
-      const btn = document.createElement('button');
-      btn.className = 'choice-btn';
+      const btn = document.createElement("button");
+      btn.className = "choice-btn";
       btn.innerText = c.text;
       btn.onclick = () => {
         step = c.next;
@@ -193,23 +393,24 @@ function render() {
       };
       choicesEl.appendChild(btn);
     });
-    mode = 'choice';
   }
-  updateUI();
 }
 
-document.addEventListener('click', () => {
-  if (mode === 'text') {
-    if (step >= story.length - 1) {
-      tipEl.innerText = '结局';
-      return;
-    }
+document.addEventListener("click", () => {
+  if(isTyping) return;
+  if(step < story.length-1){
     step++;
     render();
+  }else{
+    tipEl.innerText = "结局";
   }
 });
 
-window.onload = render;
+window.onload = function(){
+  createLeaves();
+  game.style.display = "none";
+  cover.style.display = "block";
+}
 </script>
 </body>
 </html>
